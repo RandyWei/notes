@@ -34,10 +34,6 @@
     },
   });
 
-  (<any>window).getVditorValue = () => {
-    return editor.getValue();
-  };
-
   function resizeWindows() {
     // wailsRuntime.WindowToggleMaximise();
     ResizeWindows();
@@ -59,6 +55,11 @@
     });
     //获取 fileName
     GetFileName().then((name) => {
+      fileName = name;
+    });
+    //监听保存时文件名的变化
+    wailsRuntime.EventsOn("OnFileNameChanged", (name) => {
+      console.log(name);
       fileName = name;
     });
   });

@@ -3,6 +3,8 @@ package main
 import (
 	"embed"
 	"fmt"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -36,22 +38,32 @@ func main() {
 		fmt.Printf("cd: %v\n", cd)
 	})
 	fileSubMenu.AddText("保存文件", keys.CmdOrCtrl("s"), func(cd *menu.CallbackData) {
-		filePath, err := wailsRuntime.SaveFileDialog(app.ctx, wailsRuntime.SaveDialogOptions{
-			Title:                "保存文件",
-			DefaultFilename:      app.fileName,
-			CanCreateDirectories: true,
-		})
 
-		if err != nil {
-			fmt.Printf("err: %T\n", err)
+		//如果文件不存在，则弹窗选择文件
+		//有两种情况：1、新建文件，从未保存过；2、从已有文件打开后，再删除本地文件
+		if _, err := os.Stat(app.filePath); err != nil && os.IsNotExist(err) {
+			filePath, err := wailsRuntime.SaveFileDialog(app.ctx, wailsRuntime.SaveDialogOptions{
+				Title:                "保存文件",
+				DefaultFilename:      app.fileName,
+				CanCreateDirectories: true,
+			})
+
+			if err != nil {
+				fmt.Printf("err: %T\n", err)
+			}
+			app.filePath = filePath
+			//分割出目录和文件名
+			_, fileName := filepath.Split(filePath)
+			if fileName != "" {
+				app.fileName = fileName
+			}
 		}
-
 		//如果用户手动删除掉后缀名，需要补全
-		if !strings.HasSuffix(filePath, ".md") {
-			filePath = fmt.Sprintf("%v.md", filePath)
+		if !strings.HasSuffix(app.filePath, ".md") {
+			app.filePath = fmt.Sprintf("%v.md", app.filePath)
 		}
-
-		app.saveFile(filePath)
+		wailsRuntime.EventsEmit(app.ctx, "OnFileNameChanged", app.fileName)
+		app.saveFile()
 
 	})
 
