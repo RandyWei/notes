@@ -3,13 +3,19 @@
   import * as wailsRuntime from "../wailsjs/runtime/runtime";
 
   import Vditor from "vditor";
-  import { OnVditorChanged, ResizeWindows } from "../wailsjs/go/main/App";
+  import {
+    OnVditorChanged,
+    ResizeWindows,
+    GetFileName,
+  } from "../wailsjs/go/main/App";
 
   let titleBarHeight = 35;
 
   let innerHeight;
 
   let editor;
+
+  let fileName = "";
 
   //监听 innerHeight 变化，则刷新编辑器
   $: editor = new Vditor("vditor", {
@@ -38,6 +44,7 @@
   }
 
   onMount(() => {
+    //初始化 vditor
     editor = new Vditor("vditor", {
       width: "100%",
       height: innerHeight - titleBarHeight,
@@ -50,6 +57,10 @@
         pin: true,
       },
     });
+    //获取 fileName
+    GetFileName().then((name) => {
+      fileName = name;
+    });
   });
 </script>
 
@@ -60,7 +71,7 @@
     style="--wails-draggable:drag;;height:{titleBarHeight}px;"
     on:dblclick={resizeWindows}
   >
-    标题
+    {fileName}
   </div>
   <div id="vditor" />
 </main>

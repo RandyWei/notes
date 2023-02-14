@@ -3,8 +3,8 @@ package main
 import (
 	"embed"
 	"fmt"
-	"os"
 	"runtime"
+	"strings"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -21,6 +21,7 @@ var assets embed.FS
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
+	app.fileName = "未命名.md"
 
 	//总菜单
 	notesMenu := menu.NewMenu()
@@ -37,26 +38,20 @@ func main() {
 	fileSubMenu.AddText("保存文件", keys.CmdOrCtrl("s"), func(cd *menu.CallbackData) {
 		filePath, err := wailsRuntime.SaveFileDialog(app.ctx, wailsRuntime.SaveDialogOptions{
 			Title:                "保存文件",
-			DefaultFilename:      "未命名.md",
+			DefaultFilename:      app.fileName,
 			CanCreateDirectories: true,
 		})
+
 		if err != nil {
 			fmt.Printf("err: %T\n", err)
 		}
-		fmt.Printf("str: %v\n", filePath)
 
-		file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
-		if err != nil {
-			fmt.Printf("err: %v\n", err)
+		//如果用户手动删除掉后缀名，需要补全
+		if !strings.HasSuffix(filePath, ".md") {
+			filePath = fmt.Sprintf("%v.md", filePath)
 		}
 
-		defer file.Close()
-
-		_, err = file.WriteString(app.content)
-
-		if err != nil {
-			fmt.Printf("err: %v\n", err)
-		}
+		app.saveFile(filePath)
 
 	})
 
