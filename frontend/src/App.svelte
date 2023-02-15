@@ -11,31 +11,11 @@
 
   let titleBarHeight = 35;
 
-  let innerHeight;
-
   let editor;
 
   let fileName = "";
 
-  //监听 innerHeight 变化，则刷新编辑器
-  $: editor = new Vditor("vditor", {
-    width: "100%",
-    height: innerHeight - titleBarHeight,
-    theme: "dark",
-    icon: "material",
-    preview: {
-      theme: { current: "dark" },
-    },
-    toolbarConfig: {
-      pin: true,
-    },
-    input(value) {
-      OnVditorChanged(value);
-    },
-  });
-
   function resizeWindows() {
-    // wailsRuntime.WindowToggleMaximise();
     ResizeWindows();
   }
 
@@ -43,7 +23,7 @@
     //初始化 vditor
     editor = new Vditor("vditor", {
       width: "100%",
-      height: innerHeight - titleBarHeight,
+      height: "calc(100vh - 35px)", //最好设置父布局 main 的 height 为100vh
       theme: "dark",
       icon: "material",
       preview: {
@@ -65,7 +45,6 @@
   });
 </script>
 
-<svelte:window bind:innerHeight />
 <main>
   <div
     id="title"
