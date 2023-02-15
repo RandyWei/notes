@@ -66,10 +66,21 @@ func main() {
 		app.saveFile()
 
 	})
+	//导出功能
+	// fileSubMenu.AddSeparator()
+	// exportMenu := fileSubMenu.AddSubmenu("导出")
+	// exportMenu.AddText("PDF", nil, func(cd *menu.CallbackData) {})
+	// exportMenu.AddText("HTML", nil, func(cd *menu.CallbackData) {})
 
 	if runtime.GOOS == "darwin" {
 		notesMenu.Append(menu.EditMenu())
 	}
+
+	//帮助
+	helpSubMenu := notesMenu.AddSubmenu("帮助")
+	helpSubMenu.AddText("关于", nil, func(cd *menu.CallbackData) {
+		wailsRuntime.EventsEmit(app.ctx, "OnMenuClick", "about")
+	})
 
 	// Create application with options
 	err := wails.Run(&options.App{
