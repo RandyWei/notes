@@ -6,10 +6,14 @@ export function GetFileName() {
   return window['go']['main']['App']['GetFileName']();
 }
 
-export function OnVditorChanged(arg1) {
-  return window['go']['main']['App']['OnVditorChanged'](arg1);
+export function LoadContentFromLocal() {
+  return window['go']['main']['App']['LoadContentFromLocal']();
 }
 
-export function ResizeWindows() {
-  return window['go']['main']['App']['ResizeWindows']();
+export function OnVditorValueChanged(arg1) {
+  return window['go']['main']['App']['OnVditorValueChanged'](arg1);
+}
+
+export function ResizeWindow() {
+  return window['go']['main']['App']['ResizeWindow']();
 }

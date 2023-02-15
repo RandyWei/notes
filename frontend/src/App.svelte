@@ -5,8 +5,8 @@
   import { dialogs } from "svelte-dialogs";
   import Vditor from "vditor";
   import {
-    OnVditorChanged,
-    ResizeWindows,
+    OnVditorValueChanged,
+    ResizeWindow,
     GetFileName,
   } from "../wailsjs/go/main/App";
 
@@ -23,6 +23,9 @@
     icon: "material",
     preview: {
       theme: { current: "dark" },
+    },
+    cache: {
+      enable: false,
     },
     toolbar: [
       "headings",
@@ -44,12 +47,12 @@
       pin: true,
     },
     input(value) {
-      OnVditorChanged(value);
+      OnVditorValueChanged(value);
     },
   };
 
-  function resizeWindows() {
-    ResizeWindows();
+  function resizeWindow() {
+    ResizeWindow();
   }
 
   onMount(() => {
@@ -76,6 +79,10 @@
         dialogs.modal(htmlString, opts);
       }
     });
+    //监听文件内容加载
+    wailsRuntime.EventsOn("OnLoadFile", (content) => {
+      editor.setValue(content);
+    });
   });
 </script>
 
@@ -83,7 +90,7 @@
   <div
     id="title"
     style="--wails-draggable:drag;;height:{titleBarHeight}px;"
-    on:dblclick={resizeWindows}
+    on:dblclick={resizeWindow}
   >
     {fileName}
   </div>

@@ -3,6 +3,8 @@
 
 export function GetFileName():Promise<string>;
 
-export function OnVditorChanged(arg1:string):Promise<void>;
+export function LoadContentFromLocal():Promise<string>;
 
-export function ResizeWindows():Promise<void>;
+export function OnVditorValueChanged(arg1:string):Promise<void>;
+
+export function ResizeWindow():Promise<void>;

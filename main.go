@@ -33,9 +33,55 @@ func main() {
 	}
 
 	fileSubMenu := notesMenu.AddSubmenu("文件")
-	fileSubMenu.AddText("新建文件", keys.CmdOrCtrl("n"), func(cd *menu.CallbackData) {})
+	fileSubMenu.AddText("新建文件", keys.CmdOrCtrl("n"), func(cd *menu.CallbackData) {
+		//打开文件之前，判断一下当前打开的是否已经保存，目前不支持多窗口
+		if !app.saved {
+			wailsRuntime.MessageDialog(app.ctx, wailsRuntime.MessageDialogOptions{
+				Type:    wailsRuntime.WarningDialog,
+				Title:   "警告",
+				Message: "当前内容尚未保存，请保存后再打开新文件",
+			})
+			return
+		}
+
+		app.fileName = "未命名.md"
+		app.content = ""
+
+		wailsRuntime.EventsEmit(app.ctx, "OnFileNameChanged", app.fileName)
+		wailsRuntime.EventsEmit(app.ctx, "OnLoadFile", app.content)
+	})
 	fileSubMenu.AddText("打开文件", keys.CmdOrCtrl("o"), func(cd *menu.CallbackData) {
-		fmt.Printf("cd: %v\n", cd)
+
+		//打开文件之前，判断一下当前打开的是否已经保存，目前不支持多窗口
+		if !app.saved {
+			wailsRuntime.MessageDialog(app.ctx, wailsRuntime.MessageDialogOptions{
+				Type:    wailsRuntime.WarningDialog,
+				Title:   "警告",
+				Message: "当前内容尚未保存，请保存后再打开新文件",
+			})
+			return
+		}
+
+		filePath, err := wailsRuntime.OpenFileDialog(app.ctx, wailsRuntime.OpenDialogOptions{Title: "打开文件"})
+		if err != nil {
+			fmt.Printf("err: %T\n", err)
+		}
+		app.filePath = filePath
+		//分割出目录和文件名
+		_, fileName := filepath.Split(filePath)
+		if fileName != "" {
+			app.fileName = fileName
+		}
+
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Printf("err: %T\n", err)
+		}
+
+		app.content = string(data)
+
+		wailsRuntime.EventsEmit(app.ctx, "OnFileNameChanged", app.fileName)
+		wailsRuntime.EventsEmit(app.ctx, "OnLoadFile", app.content)
 	})
 	fileSubMenu.AddText("保存文件", keys.CmdOrCtrl("s"), func(cd *menu.CallbackData) {
 
