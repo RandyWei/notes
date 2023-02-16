@@ -47,6 +47,7 @@ func main() {
 		app.fileName = "未命名.md"
 		app.content = ""
 
+		wailsRuntime.WindowSetTitle(app.ctx, app.fileName)
 		wailsRuntime.EventsEmit(app.ctx, "OnFileNameChanged", app.fileName)
 		wailsRuntime.EventsEmit(app.ctx, "OnLoadFile", app.content)
 	})
@@ -80,6 +81,7 @@ func main() {
 
 		app.content = string(data)
 
+		wailsRuntime.WindowSetTitle(app.ctx, app.fileName)
 		wailsRuntime.EventsEmit(app.ctx, "OnFileNameChanged", app.fileName)
 		wailsRuntime.EventsEmit(app.ctx, "OnLoadFile", app.content)
 	})
@@ -108,6 +110,7 @@ func main() {
 		if !strings.HasSuffix(app.filePath, ".md") {
 			app.filePath = fmt.Sprintf("%v.md", app.filePath)
 		}
+		wailsRuntime.WindowSetTitle(app.ctx, app.fileName)
 		wailsRuntime.EventsEmit(app.ctx, "OnFileNameChanged", app.fileName)
 		app.saveFile()
 

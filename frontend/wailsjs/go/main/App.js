@@ -10,6 +10,10 @@ export function LoadContentFromLocal() {
   return window['go']['main']['App']['LoadContentFromLocal']();
 }
 
+export function OS() {
+  return window['go']['main']['App']['OS']();
+}
+
 export function OnVditorValueChanged(arg1) {
   return window['go']['main']['App']['OnVditorValueChanged'](arg1);
 }

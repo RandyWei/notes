@@ -9,6 +9,7 @@
     OnVditorValueChanged,
     ResizeWindow,
     GetFileName,
+    OS,
   } from "../wailsjs/go/main/App";
 
   let titleBarHeight = 35;
@@ -17,11 +18,14 @@
 
   let fileName = "";
 
+  let showTitleBar = true;
+
   let options: IOptions = {
     width: "100%",
     height: "calc(100vh - 35px)", //最好设置父布局 main 的 height 为100vh
     theme: "dark",
     icon: "material",
+    mode: "ir",
     preview: {
       theme: { current: "dark" },
     },
@@ -62,6 +66,9 @@
   onMount(() => {
     //初始化 vditor
     editor = new Vditor("vditor", options);
+    wailsRuntime.Environment().then((info) => {
+      showTitleBar = info.platform == "darwin";
+    });
     //获取 fileName
     GetFileName().then((name) => {
       fileName = name;
@@ -95,13 +102,16 @@
 </script>
 
 <main>
-  <div
-    id="title"
-    style="--wails-draggable:drag;;height:{titleBarHeight}px;"
-    on:dblclick={resizeWindow}
-  >
-    {fileName}
-  </div>
+  {#if showTitleBar}
+    <div
+      id="title"
+      style="--wails-draggable:drag;;height:{titleBarHeight}px;"
+      on:dblclick={resizeWindow}
+    >
+      {fileName}
+    </div>
+  {/if}
+
   <ContextMenu />
   <div id="vditor" />
 </main>

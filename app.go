@@ -37,6 +37,7 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) onDomReady(ctx context.Context) {
 	a.update()
+	runtime.WindowSetTitle(a.ctx, a.fileName)
 }
 
 func (a *App) GetFileName() string {
@@ -55,6 +56,10 @@ func (a *App) OnVditorValueChanged(value string) {
 
 func (a *App) LoadContentFromLocal() string {
 	return a.content
+}
+
+func (a *App) OS() string {
+	return goRuntime.GOOS
 }
 
 // 保存文件

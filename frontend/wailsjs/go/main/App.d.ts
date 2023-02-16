@@ -5,6 +5,8 @@ export function GetFileName():Promise<string>;
 
 export function LoadContentFromLocal():Promise<string>;
 
+export function OS():Promise<string>;
+
 export function OnVditorValueChanged(arg1:string):Promise<void>;
 
 export function ResizeWindow():Promise<void>;
