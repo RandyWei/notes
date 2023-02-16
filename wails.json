@@ -6,8 +6,11 @@
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
+  "info":{
+    "productVersion": "0.0.1"
+  },
   "author": {
     "name": "RandyWei",
-    "email": "weizhengheng@chinahrt.com"
+    "email": "smile561607154@163.com"
   }
 }

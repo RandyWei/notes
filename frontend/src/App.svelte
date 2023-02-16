@@ -2,6 +2,7 @@
   import { onMount, afterUpdate } from "svelte";
   import * as wailsRuntime from "../wailsjs/runtime/runtime";
   import ContextMenu from "./ContextMenu.svelte";
+  import UpdateComponent from "./UpdateComponent.svelte";
   import { dialogs } from "svelte-dialogs";
   import Vditor from "vditor";
   import {
@@ -33,7 +34,6 @@
       "strike",
       "link",
       "list",
-      "ordered-list",
       "check",
       "outdent",
       "indent",
@@ -53,6 +53,10 @@
 
   function resizeWindow() {
     ResizeWindow();
+  }
+
+  function doUpdate(url: string) {
+    wailsRuntime.BrowserOpenURL(url);
   }
 
   onMount(() => {
@@ -83,6 +87,10 @@
     wailsRuntime.EventsOn("OnLoadFile", (content) => {
       editor.setValue(content);
     });
+    //监听版本更新
+    wailsRuntime.EventsOn("OnUpdate", (version) => {
+      dialogs.modal(UpdateComponent, { version: version });
+    });
   });
 </script>
 
@@ -94,7 +102,7 @@
   >
     {fileName}
   </div>
-  <!-- <ContextMenu /> -->
+  <ContextMenu />
   <div id="vditor" />
 </main>
 

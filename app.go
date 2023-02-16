@@ -4,6 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
+	goRuntime "runtime"
+	"strings"
+
+	"icu.bughub.app/notes/backend/network"
+	"icu.bughub.app/notes/backend/repo"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -27,6 +32,11 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.saved = true
 	a.ctx = ctx
+
+}
+
+func (a *App) onDomReady(ctx context.Context) {
+	a.update()
 }
 
 func (a *App) GetFileName() string {
@@ -63,4 +73,51 @@ func (a *App) saveFile() {
 	}
 
 	a.saved = true
+}
+
+var CurrentVersion = "0.0.1"
+
+func (a *App) update() {
+	//https://api.github.com/repos/RandyWei/notes/releases/latest
+	//https://api.github.com/repos/alist-org/alist/releases/latest
+	request := network.Request{
+		Url: "https://api.github.com/repos/RandyWei/notes/releases/latest",
+	}
+	var lastest repo.Release
+	message, err := request.PostParse(&lastest)
+	if err != nil {
+		fmt.Printf("message: %v\n", message)
+		fmt.Printf("err: %v\n", err)
+		return
+	}
+
+	version := strings.Split(strings.Replace(lastest.TagName, "v", "", 1), ".")
+
+	if len(version) < 3 {
+		return
+	}
+	major := version[0]
+	minor := version[1]
+	revision := version[2]
+
+	currentVersion := strings.Split(CurrentVersion, ".")
+
+	//判断版本号
+	if revision <= currentVersion[2] {
+		if minor <= currentVersion[1] {
+			if major <= currentVersion[0] {
+				return
+			}
+		}
+	}
+
+	//判断 assets 中是否包含对应平台的文件
+	for _, asset := range lastest.Assets {
+		//application/x-diskcopy
+		if (asset.ContentType == "application/gzip" && goRuntime.GOOS == "darwin") || (asset.ContentType == "application/x-msdownload" && goRuntime.GOOS == "windows") { //dmg文件
+			runtime.EventsEmit(a.ctx, "OnUpdate", lastest)
+			break
+		}
+	}
+
 }
